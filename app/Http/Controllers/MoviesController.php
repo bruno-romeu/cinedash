@@ -10,7 +10,7 @@ class MoviesController extends Controller
 {
     public function index(TmdbApiService $tmdb)
     {
-        return Inertia::render('Movies/Index', [
+        return Inertia::render('Dashboard', [
             'movies' => $tmdb->getPopularMovies(),
         ]);
     }

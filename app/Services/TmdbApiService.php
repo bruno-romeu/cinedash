@@ -16,7 +16,7 @@ class TmdbApiService
         ]);
 
         if (!isset($response['results'])) {
-            dd($response); // DEBUG
+            dd($response); 
         }
 
         return collect($response['results'])->map(function ($movie) {
@@ -24,7 +24,7 @@ class TmdbApiService
                 'id' => $movie['id'],
                 'title' => $movie['title'],
                 'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
-                'release_date' => $movie['release_date'],
+                'release_date' => substr($movie['release_date'], 0, 4),
             ];
         })->toArray();
     }
