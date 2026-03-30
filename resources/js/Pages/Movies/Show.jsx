@@ -3,6 +3,7 @@ import { Head } from "@inertiajs/react"
 import { Star } from "lucide-react"
 import UserAvatar from "@/Components/UserAvatar"
 import { usePage } from "@inertiajs/react"
+import RatingCard from "@/Components/RatingCard"
 
 export default function MovieShow ({ movie}) {
     const { props } = usePage();
@@ -19,12 +20,12 @@ export default function MovieShow ({ movie}) {
             <Head title={movie.title} />
 
             <div className="container mx-auto px-4 py-8 bg-surface-900 rounded-lg shadow-md">
-                <div className="flex flex-col-2 md:flex-row items-start md:items-center gap-6">
-                    <div className="w-full h-[36rem] rounded-lg shadow-3xl shadow-surface-100 overflow-hidden">
+                <div className="flex flex-col md:flex-row md:items-start gap-6">
+                    <div className="w-full md:w-auto h-[36rem] rounded-lg shadow-3xl shadow-surface-100 overflow-hidden md:sticky md:top-4">
                         <img src={movie.poster} alt={movie.title} 
                         className="w-auto h-[36rem] object-cover rounded-lg shadow-md" />
                     </div>
-                    <div className="md:ml-8">
+                    <div className="md:ml-8 flex-1">
                         <p className="text-sm font-bold text-brand-500 mt-2 drop-shadow-2xl">{movie.release_date} • {movie.runtime} min</p>
                         <h1 className="text-6xl font-bold text-surface-100">{movie.title}</h1>
                         <p className="text-lg font-semibold text-brand-500 mt-2">{movie.tagline}</p>
@@ -49,6 +50,20 @@ export default function MovieShow ({ movie}) {
                         <div>
                             <h2 className="text-xl font-bold text-surface-100 mt-4">Sinopse</h2>
                             <p className=" text-surface-400 mt-4">{movie.overview}</p>
+                        </div>
+
+                        <div>
+                            <h2 className="text-xl font-bold text-surface-100 mt-4">Avaliações Recentes</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                {movie.reviews.slice(0, 4).map((review, idx) => (
+                                  <RatingCard
+                                    key={idx}
+                                    rating={review.rating}
+                                    user={{ name: review.author, id: idx }} 
+                                    content={review.content}
+                                  />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

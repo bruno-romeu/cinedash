@@ -32,6 +32,8 @@ class TmdbApiService
     public function getMovieDetails(int $id): array
     {
             $response = $this->client->getMovieDetails($id);
+
+            $reviews = $this->client->getMovieReviews($id);
     
             if (!isset($response['id'])) {
                 dd($response); 
@@ -46,6 +48,14 @@ class TmdbApiService
                 'runtime' => $response['runtime'],
                 'overview' => $response['overview'],
                 'rating' => $response['vote_average'],
+                'reviews' => collect($reviews['results'])->map(function ($review) {
+                    return [
+                        'author' => $review['author'] ?? null,
+                        'content' => $review['content'] ?? null,
+                        'rating' => $review['author_details']['rating'] ?? null,
+                    ];
+                })->toArray(),
             ];
     }
+
 }

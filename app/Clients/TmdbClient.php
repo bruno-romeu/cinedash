@@ -29,4 +29,9 @@ class TmdbClient
     {
         return $this->get("/movie/{$id}");
     }
+
+    public function getMovieReviews(int $id, array $params = [])
+    {
+        return $this->get("/movie/{$id}/reviews", $params);
+    }
 }

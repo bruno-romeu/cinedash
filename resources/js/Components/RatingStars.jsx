@@ -1,24 +1,26 @@
+import { Star, StarHalf } from "lucide-react"
+
 export default function RatingStars ({ rating }) {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating - fullStars >= 0.5;
+    let safeRating = Number(rating);
+    if (isNaN(safeRating) || safeRating < 0) safeRating = 0;
+    // TMDB ratings vão de 0 a 10, normalizar para 0 a 5
+    safeRating = safeRating > 10 ? 10 : safeRating;
+    safeRating = safeRating / 2;
+    if (safeRating > 5) safeRating = 5;
+    const fullStars = Math.floor(safeRating);
+    const hasHalfStar = safeRating - fullStars >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
     return (
         <div className="flex items-center gap-1">
             {[...Array(fullStars)].map((_, index) => (
-                <svg key={index} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09L5.64 12.545.762 9.455l6.09-.545L10 3l2.148 5.91 6.09.545-4.878 3.09L15.878 15z" />
-                </svg>
+                <Star key={"full-"+index} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
             ))}
             {hasHalfStar && (
-                <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09L5.64 12.545.762 9.455l6.09-.545L10 3v12z" />
-                </svg>
+                <StarHalf className="w-4 h-4 text-yellow-400 fill-yellow-400" />
             )}
             {[...Array(emptyStars)].map((_, index) => (
-                <svg key={index} className="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09L5.64 12.545.762 9.455l6.09-.545L10 3l2.148 5.91 6.09.545-4.878 3.09L15.878 15z" />
-                </svg>
+                <Star key={"empty-"+index} className="w-4 h-4 text-gray-300" />
             ))}
         </div>
     )
