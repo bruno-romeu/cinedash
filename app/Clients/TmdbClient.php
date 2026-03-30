@@ -7,11 +7,15 @@ use Illuminate\Support\Facades\Http;
 class TmdbClient
 {
     protected string $baseUrl = 'https://api.themoviedb.org/3';
+    protected array $defaultParams = [
+        'language' => 'pt-BR',
+        'region' => 'BR',
+    ];
 
     public function get(string $endpoint, array $params = [])
     {
         return Http::withToken(config('services.tmdb.key'))
-        ->get($this->baseUrl . $endpoint, $params)
+        ->get($this->baseUrl . $endpoint, array_merge($this->defaultParams, $params))
         ->json();
     }
 
