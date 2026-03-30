@@ -28,4 +28,24 @@ class TmdbApiService
             ];
         })->toArray();
     }
+
+    public function getMovieDetails(int $id): array
+    {
+            $response = $this->client->getMovieDetails($id);
+    
+            if (!isset($response['id'])) {
+                dd($response); 
+            }
+    
+            return [
+                'id' => $response['id'],
+                'title' => $response['title'],
+                'tagline' => $response['tagline'],
+                'poster' => 'https://image.tmdb.org/t/p/w500' . $response['poster_path'],
+                'release_date' => substr($response['release_date'], 0, 4),
+                'runtime' => $response['runtime'],
+                'overview' => $response['overview'],
+                'rating' => $response['vote_average'],
+            ];
+    }
 }

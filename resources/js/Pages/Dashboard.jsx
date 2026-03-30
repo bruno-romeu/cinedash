@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import MovieCard from '@/Components/MovieCard';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, ArrowRight } from 'lucide-react';
 
 export default function Dashboard({ movies }) {
     return (
@@ -20,7 +20,13 @@ export default function Dashboard({ movies }) {
                         <TrendingUp className="inline-block mr-2 text-brand-500 size-9" />
                         <h1 className='text-3xl font-bold text-surface-100'>Em Destaque</h1>
                     </div>
-                    <span className='text-surface-500 text-sm hover:text-surface-100 cursor-pointer'>Ver tudo</span>
+                    <div className='flex items-center gap-1'>
+                        <span
+                         className='text-surface-500 text-sm hover:text-surface-100 cursor-pointer'>
+                            Ver tudo 
+                            <ArrowRight className="inline-block ml-1 size-4" />
+                        </span>
+                    </div>
                 </div>
 
                 <div>

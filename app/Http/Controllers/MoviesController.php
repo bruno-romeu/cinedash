@@ -14,4 +14,17 @@ class MoviesController extends Controller
             'movies' => $tmdb->getPopularMovies(),
         ]);
     }
+
+    public function show($id, TmdbApiService $tmdb)
+    {
+        $movie = $tmdb->getMovieDetails($id);
+
+        if (!$movie) {
+            return redirect()->route('dashboard')->with('error', 'Filme não encontrado.');
+        }
+
+        return Inertia::render('Movies/Show', [
+            'movie' => $movie,
+        ]);
+    }
 }
