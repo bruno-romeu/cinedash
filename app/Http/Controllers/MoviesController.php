@@ -27,4 +27,16 @@ class MoviesController extends Controller
             'movie' => $movie,
         ]);
     }
+
+    public function explore(TmdbApiService $tmdb, Request $request)
+    {
+        $page = $request->get('page', 1);
+        $moviesData = $tmdb->getPopularMovies($page);
+
+        return Inertia::render('Explore/Index', [
+            'movies' => $moviesData['results'],
+            'page' => $moviesData['page'],
+            'totalPages' => $moviesData['total_pages'],
+        ]);
+    }
 }

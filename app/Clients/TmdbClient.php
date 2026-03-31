@@ -29,6 +29,11 @@ class TmdbClient
         return $this->get('/movie/top_rated', $params);
     }
 
+    public function popularMovies(array $params = [])
+    {
+        return $this->get('/movie/popular', $params);
+    }
+
     public function getMovieDetails(int $id)
     {
         return $this->get("/movie/{$id}");

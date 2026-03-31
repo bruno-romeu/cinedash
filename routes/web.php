@@ -23,6 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/movies/{id}', [MoviesController::class, 'show'])->name('movies.show');
+
+    Route::get('/explore', [MoviesController::class, 'explore'])->name('explore.index');
 });
 
 

@@ -4,6 +4,8 @@ import SidebarNavLink from '@/Components/SideBarNavLink';
 import TextInput from '@/Components/TextInput';
 import ApplicationLogoSideBar from '@/Components/ApplicationLogoSideBar';
 import { House, Search, Bookmark, History, Trophy, User } from 'lucide-react';
+import { router } from '@inertiajs/react';
+
 
 export default function AuthenticatedLayout({ header, children }) {
 
@@ -22,12 +24,12 @@ export default function AuthenticatedLayout({ header, children }) {
                 {/* Menu */}
                 <nav className="py-4">
                     <div className="px-4 space-y-2">
-                        <SidebarNavLink href={'/dashboard'} icon={<House />} label={'Início'} active={url === '/dashboard'} />
-                        <SidebarNavLink href={'/explorar'} icon={<Search />} label={'Explorar'} active={url.startsWith('/explorar')} disabled/>
-                        <SidebarNavLink href={'/minha-lista'} icon={<Bookmark />} label={'Minha Lista'} active={url.startsWith('/minha-lista')} disabled/>
-                        <SidebarNavLink href={'/historico'} icon={<History />} label={'Histórico'} active={url.startsWith('/historico')} disabled/>
-                        <SidebarNavLink href={'/ranking'} icon={<Trophy />} label={'Ranking'} active={url.startsWith('/ranking')} disabled/>
-                        <SidebarNavLink href={'/profile'} icon={<User />} label={'Perfil'} active={url.startsWith('/profile')}/>
+                        <SidebarNavLink href={route('dashboard')} icon={<House />} label={'Início'} active={url === '/dashboard'} />
+                        <SidebarNavLink href={route('explore.index')} icon={<Search />} label={'Explorar'} active={url.startsWith('/explore')} />
+                        <SidebarNavLink href={route('dashboard')} icon={<Bookmark />} label={'Minha Lista'} active={url.startsWith('/minha-lista')} disabled/>
+                        <SidebarNavLink href={route('dashboard')} icon={<History />} label={'Histórico'} active={url.startsWith('/historico')} disabled/>
+                        <SidebarNavLink href={route('dashboard')} icon={<Trophy />} label={'Ranking'} active={url.startsWith('/ranking')} disabled/>
+                        <SidebarNavLink href={route('profile.edit')} icon={<User />} label={'Perfil'} active={url.startsWith('/profile')}/>
                     </div>
                 </nav>
 

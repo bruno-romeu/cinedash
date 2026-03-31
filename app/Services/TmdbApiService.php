@@ -10,8 +10,7 @@ class TmdbApiService
 
     public function getPopularMovies(int $page = 1): array
     {
-        $response = $this->client->discoverMovies([
-            'sort_by' => 'popularity.desc',
+        $response = $this->client->PopularMovies([
             'page' => $page,
         ]);
 
@@ -19,14 +18,26 @@ class TmdbApiService
             dd($response); 
         }
 
-        return collect($response['results'])->map(function ($movie) {
-            return [
-                'id' => $movie['id'],
-                'title' => $movie['title'],
-                'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
-                'release_date' => substr($movie['release_date'], 0, 4),
-            ];
-        })->toArray();
+        return [
+            'results' => collect($response['results'])
+                ->filter(function ($movie) {
+                    return isset($movie['adult']) && $movie['adult'] === false;
+                })
+                ->map(function ($movie) {
+                    return [
+                        'id' => $movie['id'],
+                        'title' => $movie['title'],
+                        'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
+                        'release_date' => substr($movie['release_date'], 0, 4),
+                        'rating' => $movie['vote_average'],
+                        'adult' => $movie['adult'],
+                    ];
+                })
+                ->values()
+                ->toArray(),
+            'total_pages' => $response['total_pages'] ?? 1,
+            'page' => $response['page'] ?? 1,
+        ];
     }
 
     public function getMovieDetails(int $id): array
