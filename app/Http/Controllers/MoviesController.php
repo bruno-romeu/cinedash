@@ -31,11 +31,13 @@ class MoviesController extends Controller
     public function explore(TmdbApiService $tmdb, Request $request)
     {
         $page = $request->get('page', 1);
-        $moviesData = $tmdb->getPopularMovies($page);
+        $search = $request->get('search', null);
+        $moviesData = $search ? $tmdb->searchMovies($search, $page) : $tmdb->getPopularMovies($page);
 
         return Inertia::render('Explore/Index', [
             'movies' => $moviesData['results'],
             'page' => $moviesData['page'],
+            'search' => $search,
             'totalPages' => $moviesData['total_pages'],
         ]);
     }

@@ -69,4 +69,37 @@ class TmdbApiService
             ];
     }
 
+    public function searchMovies(string $query, int $page = 1): array
+    {
+        $response = $this->client->searchMovies(
+            $query,
+            $page
+        );
+
+        if (!isset($response['results'])) {
+            dd($response); 
+        }
+
+        return [
+            'results' => collect($response['results'])
+                ->filter(function ($movie) {
+                    return isset($movie['adult']) && $movie['adult'] === false;
+                })
+                ->map(function ($movie) {
+                    return [
+                        'id' => $movie['id'],
+                        'title' => $movie['title'],
+                        'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
+                        'release_date' => substr($movie['release_date'], 0, 4),
+                        'rating' => $movie['vote_average'],
+                        'adult' => $movie['adult'],
+                    ];
+                })
+                ->values()
+                ->toArray(),
+            'total_pages' => $response['total_pages'] ?? 1,
+            'page' => $response['page'] ?? 1,
+        ];
+    }
+
 }

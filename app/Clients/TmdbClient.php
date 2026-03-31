@@ -43,4 +43,12 @@ class TmdbClient
     {
         return $this->get("/movie/{$id}/reviews", $params);
     }
+
+    public function searchMovies(string $query, int $page = 1)
+    {
+        return $this->get('/search/movie', [
+            'query' => $query,
+            'page' => $page,
+        ]);
+    }
 }

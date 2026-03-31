@@ -7,10 +7,23 @@ import { useState } from "react";
 import Pagination from "@/Components/Pagination";
 import { router } from "@inertiajs/react";
 
-export default function Explore({ movies, page, totalPages }) {
-    const handlePageChange = (newPage) => {
-        router.get(route('explore.index'), { page: newPage }, { preserveScroll: true });
+export default function Explore({ movies, page, search, totalPages }) {
+    const fetchPage = (newPage) => {
+        router.get(
+            route('explore.index'), 
+            { page: newPage, search: search }, 
+            { preserveScroll: true });
     };
+
+    const handleSearchChange = (e) => {
+        const newSearch = e.target.value;
+        router.get(
+            route('explore.index'),
+            { page: 1, search: newSearch },
+            { preserveScroll: true, preserveState: true, replace: true },
+        );
+    };
+
     return (
         <AuthenticatedLayout 
         header={
@@ -32,6 +45,7 @@ export default function Explore({ movies, page, totalPages }) {
                         type="text"
                         placeholder="Buscar filmes, atores, diretores..."
                         className="pl-10 bg-surface-700/50 text-surface-100 placeholder:text-surface-500 border-surface-600 focus:ring-brand-500 focus:border-brand-500 rounded-2xl w-full sm:w-[28rem] transition"
+                        onChange={handleSearchChange}
                     />
                 </div>
 
@@ -51,7 +65,7 @@ export default function Explore({ movies, page, totalPages }) {
                 <Pagination
                     currentPage={page}
                     totalPages={totalPages}
-                    onPageChange={handlePageChange}
+                    onPageChange={fetchPage}
                 />
         </AuthenticatedLayout>
     );

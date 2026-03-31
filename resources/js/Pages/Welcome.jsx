@@ -90,7 +90,7 @@ export default function Welcome({ auth }) {
                     </div>
 
                     {/* Features Rápidas */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-zinc-900 pt-12 text-left">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 text-left bg-zinc-900/50 rounded-lg p-8 animate-in fade-in duration-700">
                         <div className="flex gap-4">
                             <div className="text-indigo-500 shrink-0"><Layout size={24} /></div>
                             <div>
