@@ -12,6 +12,7 @@ class MoviesController extends Controller
     {
         return Inertia::render('Dashboard', [
             'movies' => $tmdb->getPopularMovies(),
+            'genres' => $tmdb->getGenres(),
         ]);
     }
 
@@ -32,13 +33,30 @@ class MoviesController extends Controller
     {
         $page = $request->get('page', 1);
         $search = $request->get('search', null);
-        $moviesData = $search ? $tmdb->searchMovies($search, $page) : $tmdb->getPopularMovies($page);
+        $genre = $request->get('genre', null);
+
+        // Permitir múltiplos ids separados por pipe (|) vindos da query string
+        $genreIds = null;
+        if ($genre) {
+            // Se vier como string '12|18', transforma em array [12,18]
+            $genreIds = is_string($genre) && str_contains($genre, '|')
+                ? explode('|', $genre)
+                : $genre;
+        }
+
+        if ($genreIds) {
+            $moviesData = $tmdb->getMoviesByGenre($genreIds, $page);
+        } else {
+            $moviesData = $search ? $tmdb->searchMovies($search, $page) : $tmdb->getPopularMovies($page);
+        }
 
         return Inertia::render('Explore/Index', [
             'movies' => $moviesData['results'],
             'page' => $moviesData['page'],
             'search' => $search,
             'totalPages' => $moviesData['total_pages'],
+            'genre' => $genre,
+            'genres' => $tmdb->getGenres(),
         ]);
     }
 }

@@ -51,4 +51,22 @@ class TmdbClient
             'page' => $page,
         ]);
     }
+
+    public function genresMovies()
+    {
+        return $this->get('/genre/movie/list');
+    }
+
+    /**
+     * @param int|array $genreId Pode ser um id único ou array de ids
+     */
+    public function moviesByGenre($genreId, int $page = 1)
+    {
+        // Permitir múltiplos ids separados por pipe (|)
+        $withGenres = is_array($genreId) ? implode('|', $genreId) : $genreId;
+        return $this->discoverMovies([
+            'with_genres' => $withGenres,
+            'page' => $page,
+        ]);
+    }
 }

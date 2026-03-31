@@ -21,7 +21,7 @@ export default function MovieCard({ movie }) {
                 <h3 className="text-lg font-semibold text-surface-100 max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title={movie.title}>
                     {movie.title}
                 </h3>
-                <p className="text-sm text-surface-500 mt-1">{movie.release_date}</p>
+                <p className="text-sm text-surface-500 mt-1">{movie.release_date} • {movie.genres[0]}</p>
             </div>
         </div>
     )

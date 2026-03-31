@@ -3,15 +3,15 @@ import { Head } from "@inertiajs/react";
 import MovieCard from "@/Components/MovieCard";
 import TextInput from "@/Components/TextInput";
 import { Search } from "lucide-react";
-import { useState } from "react";
 import Pagination from "@/Components/Pagination";
 import { router } from "@inertiajs/react";
+import GenresFiltersCard from "@/Components/GenresFiltersCard";
 
-export default function Explore({ movies, page, search, totalPages }) {
+export default function Explore({ movies, page, search, totalPages, genres, genre }) {
     const fetchPage = (newPage) => {
         router.get(
             route('explore.index'), 
-            { page: newPage, search: search }, 
+            { page: newPage, search: search, genre: genre }, 
             { preserveScroll: true });
     };
 
@@ -19,7 +19,15 @@ export default function Explore({ movies, page, search, totalPages }) {
         const newSearch = e.target.value;
         router.get(
             route('explore.index'),
-            { page: 1, search: newSearch },
+            { page: 1, search: newSearch, genre: genre },
+            { preserveScroll: true, preserveState: true, replace: true },
+        );
+    };
+
+    const handleGenreClick = (genreId) => {
+        router.get(
+            route('explore.index'),
+            { page: 1, search: search, genre: genreId },
             { preserveScroll: true, preserveState: true, replace: true },
         );
     };
@@ -49,8 +57,8 @@ export default function Explore({ movies, page, search, totalPages }) {
                     />
                 </div>
 
-                <div className="ml-10 flex items-center text-surface-500 border-surface-600 px-4 py-2 rounded-lg border hover:bg-surface-700/50 transition cursor-not-allowed border-dashed">
-                    <span>Espaço para filtros (em desenvolvimento)</span>
+                <div className="ml-10">
+                    <GenresFiltersCard genres={genres} onGenreClick={handleGenreClick} />
                 </div>
             </div>
 
