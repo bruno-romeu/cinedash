@@ -44,7 +44,9 @@ class MoviesController extends Controller
                 : $genre;
         }
 
-        if ($genreIds) {
+        if ($search && $genreIds) {
+            $moviesData = $tmdb->getMoviesBySearchAndGenre($search, $genreIds, $page);
+        } elseif ($genreIds) {
             $moviesData = $tmdb->getMoviesByGenre($genreIds, $page);
         } else {
             $moviesData = $search ? $tmdb->searchMovies($search, $page) : $tmdb->getPopularMovies($page);

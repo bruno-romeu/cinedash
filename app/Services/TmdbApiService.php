@@ -9,6 +9,21 @@ class TmdbApiService
 {
     public function __construct(protected TmdbClient $client) {}
 
+    private function mapMovie(array $movie, array $genresMap): array
+    {
+        return [
+            'id' => $movie['id'],
+            'title' => $movie['title'],
+            'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
+            'release_date' => substr($movie['release_date'], 0, 4),
+            'genres' => collect($movie['genre_ids'] ?? [])->map(function ($genreId) use ($genresMap) {
+                return $genresMap[$genreId] ?? null;
+            })->filter()->values()->toArray(),
+            'rating' => $movie['vote_average'],
+            'adult' => $movie['adult'] ?? false,
+        ];
+    }
+
     public function getGenres(): array
     {
         return Cache::remember('tmdb_genres', 86400, function () {
@@ -43,17 +58,7 @@ class TmdbApiService
                     return isset($movie['adult']) && $movie['adult'] === false;
                 })
                 ->map(function ($movie) use ($genresMap) {
-                    return [
-                        'id' => $movie['id'],
-                        'title' => $movie['title'],
-                        'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
-                        'release_date' => substr($movie['release_date'], 0, 4),
-                        'genres' => collect($movie['genre_ids'])->map(function ($genreId) use ($genresMap) {
-                            return $genresMap[$genreId] ?? null;
-                        })->filter()->values()->toArray(),
-                        'rating' => $movie['vote_average'],
-                        'adult' => $movie['adult'],
-                    ];
+                    return $this->mapMovie($movie, $genresMap);
                 })
                 ->values()
                 ->toArray(),
@@ -110,17 +115,7 @@ class TmdbApiService
                     return isset($movie['adult']) && $movie['adult'] === false;
                 })
                 ->map(function ($movie) use ($genresMap) {
-                    return [
-                        'id' => $movie['id'],
-                        'title' => $movie['title'],
-                        'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
-                        'release_date' => substr($movie['release_date'], 0, 4),
-                        'rating' => $movie['vote_average'],
-                        'adult' => $movie['adult'],
-                        'genres' => collect($movie['genre_ids'])->map(function ($genreId) use ($genresMap) {
-                            return $genresMap[$genreId] ?? null;
-                        })->filter()->values()->toArray(),
-                    ];
+                    return $this->mapMovie($movie, $genresMap);
                 })
                 ->values()
                 ->toArray(),
@@ -141,17 +136,37 @@ class TmdbApiService
 
         return [
             'results' => collect($response['results'])->map(function ($movie) use ($genresMap) {
-                return [
-                    'id' => $movie['id'],
-                    'title' => $movie['title'],
-                    'poster' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
-                    'release_date' => substr($movie['release_date'], 0, 4),
-                    'genres' => collect($movie['genre_ids'] ?? [])->map(function ($genreId) use ($genresMap) {
-                        return $genresMap[$genreId] ?? null;
-                    })->filter()->values()->toArray(),
-                    'rating' => $movie['vote_average'],
-                ];
+                return $this->mapMovie($movie, $genresMap);
             })->toArray(),
+            'total_pages' => $response['total_pages'] ?? 1,
+            'page' => $response['page'] ?? 1,
+        ];
+    }
+
+    public function getMoviesBySearchAndGenre(string $query, int|array $genreId, int $page = 1): array
+    {
+        $response = $this->client->searchMovies($query, $page);
+
+        if (!isset($response['results'])) {
+            dd($response);
+        }
+
+        $genresMap = $this->getGenres();
+        $genreIds = array_map('intval', is_array($genreId) ? $genreId : [$genreId]);
+
+        return [
+            'results' => collect($response['results'])
+                ->filter(function ($movie) {
+                    return isset($movie['adult']) && $movie['adult'] === false;
+                })
+                ->filter(function ($movie) use ($genreIds) {
+                    return !empty(array_intersect($movie['genre_ids'] ?? [], $genreIds));
+                })
+                ->map(function ($movie) use ($genresMap) {
+                    return $this->mapMovie($movie, $genresMap);
+                })
+                ->values()
+                ->toArray(),
             'total_pages' => $response['total_pages'] ?? 1,
             'page' => $response['page'] ?? 1,
         ];

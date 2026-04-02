@@ -52,6 +52,7 @@ export default function Explore({ movies, page, search, totalPages, genres, genr
                         id="search"
                         type="text"
                         placeholder="Buscar filmes, atores, diretores..."
+                        value={search ?? ""}
                         className="pl-10 bg-surface-700/50 text-surface-100 placeholder:text-surface-500 border-surface-600 focus:ring-brand-500 focus:border-brand-500 rounded-2xl w-full sm:w-[28rem] transition"
                         onChange={handleSearchChange}
                     />
