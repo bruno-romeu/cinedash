@@ -39,6 +39,24 @@ class TmdbApiService
         });
     }
 
+    public function getMovieCast(int $id): array
+    {
+        $response = $this->client->movieCast($id);
+
+        if (!isset($response['cast'])) {
+            return [];
+        }
+
+        return collect($response['cast'])->map(function ($cast) {
+            return [
+                'name' => $cast['name'] ?? null,
+                'character' => $cast['character'] ?? null,
+                'profile_path' => isset($cast['profile_path']) ? 'https://image.tmdb.org/t/p/w185' . $cast['profile_path'] : null,
+                'order' => $cast['order'] ?? null,
+            ];
+        })->toArray();
+    }
+
     public function getPopularMovies(int $page = 1): array
     {
         $response = $this->client->PopularMovies([
@@ -76,8 +94,12 @@ class TmdbApiService
             if (!isset($response['id'])) {
                 dd($response); 
             }
+
+            $castMap = collect($this->getMovieCast($id))->keyBy('order');
+
             return [
                 'id' => $response['id'],
+                'backdrop_path' => 'https://image.tmdb.org/t/p/w780' . $response['backdrop_path'],
                 'title' => $response['title'],
                 'tagline' => $response['tagline'],
                 'poster' => 'https://image.tmdb.org/t/p/w500' . $response['poster_path'],
@@ -85,7 +107,8 @@ class TmdbApiService
                 'runtime' => $response['runtime'],
                 'overview' => $response['overview'],
                 'rating' => $response['vote_average'],
-                'genres' => collect($response['genres'] ?? [])->pluck('name')->toArray(),       
+                'genres' => collect($response['genres'] ?? [])->pluck('name')->toArray(),  
+                'cast' => $castMap->sortBy('order')->take(5)->values()->toArray(),   
                 'reviews' => collect($reviews['results'])->map(function ($review) {
                     return [
                         'author' => $review['author'] ?? null,

@@ -69,4 +69,9 @@ class TmdbClient
             'page' => $page,
         ]);
     }
+
+    public function movieCast(int $id)
+    {
+        return $this->get("/movie/{$id}/credits");
+    }
 }

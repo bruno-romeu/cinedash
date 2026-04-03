@@ -6,28 +6,42 @@ import { Search } from "lucide-react";
 import Pagination from "@/Components/Pagination";
 import { router } from "@inertiajs/react";
 import GenresFiltersCard from "@/Components/GenresFiltersCard";
+import { useEffect, useState } from "react";
 
 export default function Explore({ movies, page, search, totalPages, genres, genre }) {
+    const [searchTerm, setSearchTerm] = useState(search ?? "");
+
+    useEffect(() => {
+        setSearchTerm(search ?? "");
+    }, [search]);
+
     const fetchPage = (newPage) => {
         router.get(
             route('explore.index'), 
-            { page: newPage, search: search, genre: genre }, 
+            { page: newPage, search: searchTerm, genre: genre }, 
             { preserveScroll: true });
     };
 
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            router.get(
+                route('explore.index'),
+                { page: 1, search: searchTerm, genre: genre },
+                { preserveScroll: true, preserveState: true, replace: true },
+            );
+        }, 350);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [searchTerm]);
+
     const handleSearchChange = (e) => {
-        const newSearch = e.target.value;
-        router.get(
-            route('explore.index'),
-            { page: 1, search: newSearch, genre: genre },
-            { preserveScroll: true, preserveState: true, replace: true },
-        );
+        setSearchTerm(e.target.value);
     };
 
     const handleGenreClick = (genreId) => {
         router.get(
             route('explore.index'),
-            { page: 1, search: search, genre: genreId },
+            { page: 1, search: searchTerm, genre: genreId },
             { preserveScroll: true, preserveState: true, replace: true },
         );
     };
@@ -52,7 +66,7 @@ export default function Explore({ movies, page, search, totalPages, genres, genr
                         id="search"
                         type="text"
                         placeholder="Buscar filmes, atores, diretores..."
-                        value={search ?? ""}
+                        value={searchTerm}
                         className="pl-10 bg-surface-700/50 text-surface-100 placeholder:text-surface-500 border-surface-600 focus:ring-brand-500 focus:border-brand-500 rounded-2xl w-full sm:w-[28rem] transition"
                         onChange={handleSearchChange}
                     />

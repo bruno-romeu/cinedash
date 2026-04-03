@@ -20,6 +20,15 @@ export default function MovieShow ({ movie}) {
             <Head title={movie.title} />
 
             <div className="container mx-auto px-4 py-8 bg-surface-900 rounded-lg shadow-md">
+                <div className="br-0 bl-0 relative w-full h-[36rem] rounded-lg shadow-3xl shadow-surface-100 overflow-hidden">
+                    <img 
+                        src={movie.backdrop_path} 
+                        alt={movie.title} 
+                        className="w-full h-full object-cover" 
+                    />
+                    
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface-900 from-5% to-transparent pointer-events-none"></div>
+                </div>
                 <div className="flex flex-col md:flex-row md:items-start gap-6">
                     <div className="w-full md:w-auto h-[36rem] rounded-lg shadow-3xl shadow-surface-100 overflow-hidden md:sticky md:top-4">
                         <img src={movie.poster} alt={movie.title} 
@@ -54,6 +63,23 @@ export default function MovieShow ({ movie}) {
                         <div>
                             <h2 className="text-xl font-bold text-surface-100 mt-4">Sinopse</h2>
                             <p className=" text-surface-400 mt-4">{movie.overview}</p>
+                        </div>
+
+                        <div>
+                            <h2 className="text-xl font-bold text-surface-100 mt-4">Elenco</h2>
+                            {movie.cast && movie.cast.length > 0 ? (
+                                <div className="flex flex-wrap gap-4 mt-4">
+                                    {movie.cast.map((actor, idx) => (
+                                        <div key={idx} className="flex flex-col items-center">
+                                            <img src={actor.profile_path} alt={actor.name} className="w-20 h-20 rounded-full object-cover" />
+                                            <p className="text-surface-100 mt-2">{actor.name}</p>
+                                            <p className="text-surface-500 text-sm">{actor.character}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-surface-400 mt-4">Elenco não disponível.</p>
+                            )}
                         </div>
 
                         {movie.reviews && movie.reviews.length > 0 ?
