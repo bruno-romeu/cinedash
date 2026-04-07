@@ -168,17 +168,35 @@ class TmdbApiService
 
     public function getMoviesBySearchAndGenre(string $query, int|array $genreId, int $page = 1): array
     {
-        $response = $this->client->searchMovies($query, $page);
-
-        if (!isset($response['results'])) {
-            dd($response);
-        }
+        $page = max(1, (int) $page);
+        $perPage = 20;
+        $startIndex = ($page - 1) * $perPage;
+        $endIndex = $startIndex + $perPage;
 
         $genresMap = $this->getGenres();
-        $genreIds = array_map('intval', is_array($genreId) ? $genreId : [$genreId]);
+        $genreIds = array_values(array_map('intval', is_array($genreId) ? $genreId : [$genreId]));
+        sort($genreIds);
 
-        return [
-            'results' => collect($response['results'])
+        $cacheKey = 'tmdb_search_genre_' . md5(mb_strtolower(trim($query)) . '|' . implode('|', $genreIds));
+        $state = Cache::get($cacheKey, [
+            'filtered_movies' => [],
+            'last_source_page' => 0,
+            'source_total_pages' => 1,
+            'complete' => false,
+        ]);
+
+        // Busca incremental: só avança páginas da API quando necessário.
+        while (!$state['complete'] && count($state['filtered_movies']) < $endIndex) {
+            $nextSourcePage = $state['last_source_page'] + 1;
+            $response = $this->client->searchMovies($query, $nextSourcePage);
+
+            if (!isset($response['results'])) {
+                dd($response);
+            }
+
+            $state['source_total_pages'] = (int) ($response['total_pages'] ?? 1);
+
+            $currentFiltered = collect($response['results'])
                 ->filter(function ($movie) {
                     return isset($movie['adult']) && $movie['adult'] === false;
                 })
@@ -189,9 +207,24 @@ class TmdbApiService
                     return $this->mapMovie($movie, $genresMap);
                 })
                 ->values()
-                ->toArray(),
-            'total_pages' => $response['total_pages'] ?? 1,
-            'page' => $response['page'] ?? 1,
+                ->toArray();
+
+            $state['filtered_movies'] = array_merge($state['filtered_movies'], $currentFiltered);
+            $state['last_source_page'] = $nextSourcePage;
+            $state['complete'] = $state['last_source_page'] >= $state['source_total_pages'];
+        }
+
+        Cache::put($cacheKey, $state, now()->addMinutes(15));
+
+        $results = array_slice($state['filtered_movies'], $startIndex, $perPage);
+        $totalPages = $state['complete']
+            ? max(1, (int) ceil(count($state['filtered_movies']) / $perPage))
+            : max(1, (int) $state['source_total_pages']);
+
+        return [
+            'results' => $results,
+            'total_pages' => $totalPages,
+            'page' => $page,
         ];
     }
 

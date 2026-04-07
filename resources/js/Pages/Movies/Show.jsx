@@ -1,39 +1,76 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
-import { Head } from "@inertiajs/react"
 import { Star } from "lucide-react"
 import UserAvatar from "@/Components/UserAvatar"
-import { usePage } from "@inertiajs/react"
+import { router, usePage } from "@inertiajs/react"
+import { useState } from "react"
 import RatingCard from "@/Components/RatingCard"
+import MovieActions from "@/Components/MovieActions"
+import ReviewCard from "@/Components/ReviewCard"
 
-export default function MovieShow ({ movie}) {
+export default function MovieShow ({ movie, userMovieStatus }) {
     const { props } = usePage();
     const auth = props.auth;
     const user = auth.user;
+    const [isInList, setIsInList] = useState(userMovieStatus?.isInList ?? false);
+    const [isWatched, setIsWatched] = useState(userMovieStatus?.isWatched ?? false);
+    const [isLoadingAction, setIsLoadingAction] = useState(false);
+
+    const handleAddToList = () => {
+        router.post(route("movies.favorite", movie.id), {}, {
+            preserveScroll: true,
+            onStart: () => setIsLoadingAction(true),
+            onSuccess: () => setIsInList(true),
+            onFinish: () => setIsLoadingAction(false),
+        });
+    };
+
+    const handleMarkAsWatched = () => {
+        router.post(route("movies.watched", movie.id), {}, {
+            preserveScroll: true,
+            onStart: () => setIsLoadingAction(true),
+            onSuccess: () => {
+                setIsWatched(true);
+                setIsInList(true);
+            },
+            onFinish: () => setIsLoadingAction(false),
+        });
+    };
     return (
         <AuthenticatedLayout
-        header={
-                <h2 className="text-xl font-semibold leading-tight text-surface-100">
-                    Detalhes Do Filme
-                </h2>
-            }
         >
-            <Head title={movie.title} />
+            <div className="br-0 bl-0 relative w-full h-[36rem] shadow-3xl shadow-surface-100 overflow-hidden ">
+                <img 
+                    src={movie.backdrop_path} 
+                    alt={movie.title} 
+                    className="w-full h-full object-cover" 
+                />
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-900 from-5% to-transparent pointer-events-none"></div>
+            </div>
 
             <div className="container mx-auto px-4 py-8 bg-surface-900 rounded-lg shadow-md">
-                <div className="br-0 bl-0 relative w-full h-[36rem] rounded-lg shadow-3xl shadow-surface-100 overflow-hidden">
-                    <img 
-                        src={movie.backdrop_path} 
-                        alt={movie.title} 
-                        className="w-full h-full object-cover" 
-                    />
-                    
-                    <div className="absolute inset-0 bg-gradient-to-t from-surface-900 from-5% to-transparent pointer-events-none"></div>
-                </div>
                 <div className="flex flex-col md:flex-row md:items-start gap-6">
-                    <div className="w-full md:w-auto h-[36rem] rounded-lg shadow-3xl shadow-surface-100 overflow-hidden md:sticky md:top-4">
-                        <img src={movie.poster} alt={movie.title} 
-                        className="w-auto h-[36rem] object-cover rounded-lg shadow-md" />
+                    <div className="flex flex-col gap-6 w-full md:w-[24rem] md:sticky md:top-4 self-start">
+                        <div className="w-full h-[36rem] rounded-lg shadow-3xl shadow-surface-100 overflow-hidden">
+                            <img src={movie.poster} alt={movie.title}
+                            className="w-full h-[36rem] object-cover rounded-lg shadow-md" />
+                        </div>
+                        <div className="w-full">
+                            <MovieActions
+                                onAddToList={handleAddToList}
+                                onMarkAsWatched={handleMarkAsWatched}
+                                isInList={isInList}
+                                isWatched={isWatched}
+                                isLoading={isLoadingAction}
+                            />
+                        </div>
+
+                        <div>
+                            <ReviewCard />
+                        </div>
                     </div>
+                    
+                        
                     <div className="md:ml-8 flex-1">
                         <p className="text-sm font-bold text-brand-500 mt-2 drop-shadow-2xl">{movie.release_date} • {movie.runtime} min</p>
                         <h1 className="text-6xl font-bold text-surface-100">{movie.title}</h1>

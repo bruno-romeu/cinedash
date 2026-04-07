@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\UserMovies;
 use App\Services\TmdbApiService;
 use Inertia\Inertia;
 
@@ -16,7 +17,7 @@ class MoviesController extends Controller
         ]);
     }
 
-    public function show($id, TmdbApiService $tmdb)
+    public function show($id, TmdbApiService $tmdb, Request $request)
     {
         $movie = $tmdb->getMovieDetails($id);
 
@@ -24,8 +25,17 @@ class MoviesController extends Controller
             return redirect()->route('dashboard')->with('error', 'Filme não encontrado.');
         }
 
+        $userMovie = UserMovies::query()
+            ->where('user_id', $request->user()->id)
+            ->where('movie_id', $id)
+            ->first();
+
         return Inertia::render('Movies/Show', [
             'movie' => $movie,
+            'userMovieStatus' => [
+                'isInList' => in_array($userMovie?->status, ['watchlist', 'watched'], true),
+                'isWatched' => $userMovie?->status === 'watched',
+            ],
         ]);
     }
 

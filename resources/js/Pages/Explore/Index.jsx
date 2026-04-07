@@ -6,10 +6,11 @@ import { Search } from "lucide-react";
 import Pagination from "@/Components/Pagination";
 import { router } from "@inertiajs/react";
 import GenresFiltersCard from "@/Components/GenresFiltersCard";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Explore({ movies, page, search, totalPages, genres, genre }) {
     const [searchTerm, setSearchTerm] = useState(search ?? "");
+    const isFirstSearchEffect = useRef(true);
 
     useEffect(() => {
         setSearchTerm(search ?? "");
@@ -23,6 +24,11 @@ export default function Explore({ movies, page, search, totalPages, genres, genr
     };
 
     useEffect(() => {
+        if (isFirstSearchEffect.current) {
+            isFirstSearchEffect.current = false;
+            return;
+        }
+
         const timeoutId = window.setTimeout(() => {
             router.get(
                 route('explore.index'),

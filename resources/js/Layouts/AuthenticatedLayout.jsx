@@ -57,7 +57,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     <header className="bg-surface-900/50">
                         <div className="flex justify-between items-center mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                             {header}
-                            {!url.startsWith('/profile') && 
+                            {!url.startsWith('/profile') && !url.startsWith('/movies') && (
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-500">
                                         <Search size={18} />
@@ -69,7 +69,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         className="pl-10 bg-surface-800 text-surface-100 placeholder:text-surface-500 border-surface-600 focus:ring-brand-500 focus:border-brand-500 rounded-lg w-full sm:w-64 transition"
                                     />
                                 </div>
-                            }
+                            )}
                             
                         </div>
                     </header>

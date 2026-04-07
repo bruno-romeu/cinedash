@@ -49,6 +49,7 @@ class TmdbClient
         return $this->get('/search/movie', [
             'query' => $query,
             'page' => $page,
+            'include_adult' => false,
         ]);
     }
 

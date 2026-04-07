@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MoviesController;
+use App\Http\Controllers\UserMoviesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,6 +24,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/movies/{id}', [MoviesController::class, 'show'])->name('movies.show');
+
+    Route::post('/movies/{id}/favorite', [UserMoviesController::class, 'favorite'])->name('movies.favorite');
+    Route::post('/movies/{id}/watched', [UserMoviesController::class, 'watched'])->name('movies.watched');
 
     Route::get('/explore', [MoviesController::class, 'explore'])->name('explore.index');
 });
